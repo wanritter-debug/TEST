@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>จองรถตู้ลีมูซีน - Al Hijrah & Travel</title>
+    <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
@@ -723,7 +724,7 @@
                     </select>
                 </div>
             </div>
-
+            
             <div class="section">
                 <div class="section-title" id="outboundDateTitle">📅 วันที่เดินทาง</div>
                 <div class="input-group" id="dateGroup">
@@ -880,8 +881,8 @@
     </div>  <!-- ← ปิด phoneGroup -->
 </div>  <!-- ← ปิด section ข้อมูลผู้จอง (บรรทัดนี้ที่ขาดหายไป!) -->
             
-                <div class="section" id="seatSection">
-                    <div class="section-title">💺 จำนวนที่นั่ง</div>
+            <div class="section" id="seatSection">
+                <div class="section-title">💺 จำนวนที่นั่ง</div>
                 <div class="input-group">
                     <label>จำนวนที่นั่งที่ต้องการจอง</label>
                     <input type="number" id="seatCount" min="1" value="1" style="text-align: center; font-size: 18px; font-weight: bold;">
@@ -915,10 +916,14 @@
         }
         
         function declineTerms() {
+            if (typeof liff !== 'undefined' && liff.isInClient()) {
+                liff.closeWindow();
+            } else {
                 alert('กรุณายอมรับเงื่อนไขเพื่อดำเนินการจองค่ะ');
+            }
         }
         const CONFIG = {
-            LIFF_ID: 'TEST_MODE'
+            LIFF_ID: '2008429094-vOzMl2Xm'
         };
         
         const TIME_SLOTS = {
@@ -1360,31 +1365,90 @@ returnDatePicker.addEventListener('change', () => {
             }
         }
         
-            detectDevice();
-            renderTimeSlots('pattani-airport');
-            renderReturnTimeSlots('airport-pattani');
-            selectTripType('oneway');
+        // เรียกใช้ฟังก์ชันตรวจสอบอุปกรณ์
+        detectDevice();
+        renderTimeSlots('pattani-airport');
+        renderReturnTimeSlots('airport-pattani');
+        selectTripType('oneway');
+
+        document.getElementById('vehicleType').addEventListener('change', function() {
+            const seatSection = document.getElementById('seatSection');
+            if (this.value === 'รถเก๋งเหมาคัน 4 ที่นั่ง') {
+                seatSection.style.display = 'none';
+            } else {
+                seatSection.style.display = 'block';
+            }
+        });
+        
+        window.addEventListener('load', async () => {
+            let retries = 0;
+            const maxRetries = 10;
             
-            document.getElementById('vehicleType').addEventListener('change', function() {
-                const seatSection = document.getElementById('seatSection');
-                if (this.value === 'รถเก๋งเหมาคัน 4 ที่นั่ง') {
-                    seatSection.style.display = 'none';
-                    document.getElementById('seatCount').value = 1;
-                    updateTotalPrice();
-                } else {
-                    seatSection.style.display = 'block';
-                }
-            });
+            const waitForLiff = () => {
+                return new Promise((resolve, reject) => {
+                    const checkLiff = setInterval(() => {
+                        retries++;
+                        if (typeof liff !== 'undefined') {
+                            clearInterval(checkLiff);
+                            resolve(true);
+                        } else if (retries >= maxRetries) {
+                            clearInterval(checkLiff);
+                            reject(new Error('LIFF SDK failed to load'));
+                        }
+                    }, 300);
+                });
+            };
             
-            window.addEventListener('load', async () => {
+            try {
+                showDebug('รอ LIFF SDK โหลด...');
+                await waitForLiff();
+                showDebug('✅ LIFF SDK โหลดสำเร็จ');
+            } catch (error) {
+                showDebug('❌ ไม่สามารถเชื่อมต่อ LIFF - ใช้งานแบบ Standalone');
                 isLiffReady = false;
                 userProfile = { 
-                    userId: 'test_' + Date.now(), 
-                    displayName: 'ผู้ทดสอบระบบ' 
+                    userId: 'web_' + Date.now(), 
+                    displayName: 'ผู้ใช้ผ่าน Web' 
                 };
-                showDebug('🧪 TEST MODE - ไม่ต้องใช้ LINE');
-                document.getElementById('debugInfo').style.display = 'block';
-            });
+                return;  // ← หยุดแต่มี userProfile แล้ว ✅
+            }
+            
+            try {
+                showDebug('กำลังเริ่มต้น LIFF...');
+                await liff.init({ liffId: CONFIG.LIFF_ID });
+                showDebug('✅ LIFF เริ่มต้นสำเร็จ');
+
+                // ✅ ตรวจสอบว่าเปิดใน LINE หรือไม่
+                if (!liff.isInClient()) {
+                    showDebug('⚠️ เปิดนอก LINE App - ใช้งานแบบ Standalone');
+                    isLiffReady = false;
+                    userProfile = { 
+                        userId: 'web_' + Date.now(), 
+                        displayName: 'ผู้ใช้ผ่าน Web' 
+                    };
+                    return;
+                }
+                               
+                isLiffReady = true;
+                showDebug('✅ เปิดใน LINE App แล้ว');
+                
+                const profile = await liff.getProfile();
+                userProfile = profile;
+                document.getElementById('userInfo').style.display = 'flex';
+                document.getElementById('userName').textContent = profile.displayName;
+                document.getElementById('userPicture').src = profile.pictureUrl;
+                showDebug(`✅ โหลดโปรไฟล์: ${profile.displayName}`);
+                
+            } catch (error) {
+                console.error('LIFF Error:', error);
+                showDebug(`❌ LIFF Error - ใช้งานแบบ Standalone`);
+                isLiffReady = false;
+                userProfile = { 
+                    userId: 'web_' + Date.now(), 
+                    displayName: 'ผู้ใช้ผ่าน Web' 
+                };
+            }
+        });
         
         document.getElementById('submitBtn').addEventListener('click', async () => {
     ['dateGroup', 'nameGroup', 'phoneGroup', 'locationGroup', 'timeError', 'airlineGroup', 'flightTimeGroup'].forEach(clearError);
@@ -1527,7 +1591,11 @@ returnDatePicker.addEventListener('change', () => {
                 try {
                     showDebug('กำลังสร้างข้อความ...');
                     
-                    let msg = `━━━━━━━━━━━━━━━━\n📋 หมายเลขคำขอ: ${reqNum}\n\n🎫 ประเภท: ${tripType}`;                    
+                    const headerMsg = vehicleType === 'รถเก๋งเหมาคัน 4 ที่นั่ง'
+                        ? `📋 คำขอจอง ${vehicleType}\nกรุณาคัดลอกข้อความนี้ส่งไปยัง LINE @alhijrah`
+                        : `📋 คำขอจองเช็คที่นั่ง${vehicleType}\nกรุณาคัดลอกข้อความนี้ส่งไปยัง LINE @alhijrah`;
+                    let msg = `${headerMsg}\n━━━━━━━━━━━━━━━━\n📋 หมายเลขคำขอ: ${reqNum}\n\n🎫 ประเภท: ${tripType}\n🚗 ประเภทรถ: ${vehicleType}`;
+                                        
                     if (tripType === 'ไป-กลับ') {
                         msg += `\n\n🛫 ขาไป`;
                     }
@@ -1567,57 +1635,59 @@ returnDatePicker.addEventListener('change', () => {
                         msg += `\n📍 ${returnLocationLabel}: ${returnData.location}`;
                     }
                     
-                    msg += `\n\n━━━━━━━━━━━━━━━━\n👤 ชื่อผู้จอง: ${customerName}\n📞 เบอร์โทร: ${phone}`;
-                    if (vehicleType === 'รถเก๋งเหมาคัน 4 ที่นั่ง') {
-                        msg += `\n🚗 การจอง: เหมาคัน (4 ที่นั่ง)`;
-                    } else {
-                        msg += `\n💺 จำนวนที่นั่ง: ${seatCount} ที่นั่ง`;
-                    }
+                        msg += `\n\n━━━━━━━━━━━━━━━━\n👤 ชื่อผู้จอง: ${customerName}\n📞 เบอร์โทร: ${phone}`;
                     if (vehicleType === 'รถเก๋งเหมาคัน 4 ที่นั่ง') {
                         msg += `\n💰 ราคา: เจ้าหน้าที่จะแจ้งให้ทราบโดยเร็วที่สุดค่ะ`;
                     } else {
+                        msg += `\n💺 จำนวนที่นั่ง: ${seatCount} ที่นั่ง`;
                         msg += `\n💰 ราคารวม: ${totalPrice.toLocaleString()} บาท`;
-                    }                    msg += `\n\n━━━━━━━━━━━━━━━━\n💬 เจ้าหน้าที่จะติดต่อกลับเพื่อยืนยันการจองโดยเร็วที่สุดค่ะ`;
+                    }
+                        msg += `\n\n━━━━━━━━━━━━━━━━\n💬 เจ้าหน้าที่จะติดต่อกลับเพื่อยืนยันการจองโดยเร็วที่สุดค่ะ`;
                     
-                                    const lineMsg = `✅ รับคำขอเช็คที่นั่ง${vehicleType}เรียบร้อยแล้วค่ะ\n` + msg;
-                                    const popupMsg = `📋 คำขอจอง ${vehicleType}\nกรุณาคัดลอกข้อความนี้ส่งไปยัง LINE @alhijrah\n` + msg;
+                    // ลองส่ง LINE Message
+                    if (typeof liff !== 'undefined' && liff.isLoggedIn()) {
+                        try {
+                            await liff.sendMessages([{
+                                type: 'text',
+                                text: msg
+                            }]);
+                            showDebug('✅ ส่งข้อความ LINE สำเร็จ');
+                            showMessage('success', `✅ จองสำเร็จ! หมายเลข: ${reqNum}`);
+                            
+                            setTimeout(() => {
+                                if (liff.isInClient()) {
+                                    liff.closeWindow();
+                                }
+                            }, 2000);
+                        } catch (lineError) {
+                            showDebug('⚠️ ไม่สามารถส่ง LINE Message');
+                            showMessagePopup(msg, reqNum, vehicleType);
+                        }
+                    } else {
+                        showDebug('⚠️ เปิดผ่าน Browser - แสดงข้อความให้ copy');
+                        showMessagePopup(msg, reqNum, vehicleType);
+                    }
                     
-                                    if (typeof liff !== 'undefined' && liff.isLoggedIn()) {
-                                        try {
-                                            await liff.sendMessages([{ type: 'text', text: lineMsg }]);
-                                            showDebug('✅ ส่งข้อความ LINE สำเร็จ');
-                                            showMessage('success', `✅ จองสำเร็จ! หมายเลข: ${reqNum}`);
-                                            setTimeout(() => {
-                                                if (liff.isInClient()) liff.closeWindow();
-                                            }, 2000);
-                                        } catch (lineError) {
-                                            showDebug('⚠️ ไม่สามารถส่ง LINE Message');
-                                            showMessagePopup(popupMsg, reqNum, vehicleType);
-                                        }
-                                    } else {
-                                        showDebug('⚠️ เปิดผ่าน Browser');
-                                        showMessagePopup(popupMsg, reqNum, vehicleType);
-                                    }
-                                        
-                                    } catch (error) {
-                                        console.error('Error:', error);
-                                        showDebug(`❌ Error: ${error.message}`);
-                                        showMessage('error', '❌ เกิดข้อผิดพลาด กรุณาลองใหม่');
-                                    }
-                                    
-                                    showLoading(false);
-                            });
+               
+                } catch (lineError) {
+                        console.error('LINE Error:', lineError);
+                        showDebug(`⚠️ LINE Error: ${lineError.message}`);
+                        showMessage('success', `✅ บันทึกข้อมูลสำเร็จ! หมายเลข: ${reqNum}`);
+                    }
+                    
+                    showLoading(false);
+            });
                 
 
             function showMessagePopup(message, reqNum, vehicleType) {
-                const popup = document.createElement('div');
+        const popup = document.createElement('div');
                 popup.className = 'message-popup active';
                 popup.innerHTML = `
                     <div class="message-box">
                         <div class="message-header">
-                            <h3>📋 คำขอจอง ${vehicleType}</h3>
+                            <h3>✅ บันทึกข้อมูลสำเร็จ!</h3>
                             <p style="font-size: 14px; margin-top: 5px;">หมายเลข: ${reqNum}</p>
-                            <p style="font-size: 13px; margin-top: 10px; opacity: 0.9;">กรุณาคัดลอกข้อความด้านล่างและส่งไปยัง LINE <strong>@alhijrah</strong> เพื่อแจ้งให้เราทราบค่ะ</p>                        </div>
+                        </div>
                         <div class="message-content">${message}</div>
                         <div class="message-buttons">
                             <button class="copy-btn" onclick="copyMessage(this)">📋 คัดลอกข้อความ</button>
@@ -1627,6 +1697,9 @@ returnDatePicker.addEventListener('change', () => {
                 `;
                 document.body.appendChild(popup);
                 popup.messageText = message;
+                popup.querySelector('h3').textContent = vehicleType === 'รถเก๋งเหมาคัน 4 ที่นั่ง'
+                    ? `📋 คำขอจอง ${vehicleType}`
+                    : `📋 คำขอจองเช็คที่นั่ง${vehicleType}`;
             }
             
             function copyMessage(btn) {
