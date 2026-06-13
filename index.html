@@ -715,6 +715,16 @@
             </div>
 
             <div class="section">
+                <div class="section-title">🚗 ประเภทรถ</div>
+                <div class="input-group">
+                    <select id="vehicleType">
+                        <option value="รถตู้ลีมูซีน">รถตู้ลีมูซีน</option>
+                        <option value="รถเก๋งเหมาคัน 4 ที่นั่ง">รถเก๋งเหมาคัน (4 ที่นั่ง)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="section">
                 <div class="section-title" id="outboundDateTitle">📅 วันที่เดินทาง</div>
                 <div class="input-group" id="dateGroup">
                     <label>กรุณาเลือกวันที่</label>
@@ -870,8 +880,8 @@
     </div>  <!-- ← ปิด phoneGroup -->
 </div>  <!-- ← ปิด section ข้อมูลผู้จอง (บรรทัดนี้ที่ขาดหายไป!) -->
             
-            <div class="section">
-                <div class="section-title">💺 จำนวนที่นั่ง</div>
+                <div class="section" id="seatSection">
+                    <div class="section-title">💺 จำนวนที่นั่ง</div>
                 <div class="input-group">
                     <label>จำนวนที่นั่งที่ต้องการจอง</label>
                     <input type="number" id="seatCount" min="1" value="1" style="text-align: center; font-size: 18px; font-weight: bold;">
@@ -1350,21 +1360,31 @@ returnDatePicker.addEventListener('change', () => {
             }
         }
         
-        // เรียกใช้ฟังก์ชันตรวจสอบอุปกรณ์
-        detectDevice();
-        renderTimeSlots('pattani-airport');
-        renderReturnTimeSlots('airport-pattani');
-        selectTripType('oneway');
-        
-        window.addEventListener('load', async () => {
-            isLiffReady = false;
-            userProfile = { 
-                userId: 'test_' + Date.now(), 
-                displayName: 'ผู้ทดสอบระบบ' 
-            };
-            showDebug('🧪 TEST MODE - ไม่ต้องใช้ LINE');
-            document.getElementById('debugInfo').style.display = 'block';
-        });
+            detectDevice();
+            renderTimeSlots('pattani-airport');
+            renderReturnTimeSlots('airport-pattani');
+            selectTripType('oneway');
+            
+            document.getElementById('vehicleType').addEventListener('change', function() {
+                const seatSection = document.getElementById('seatSection');
+                if (this.value === 'รถเก๋งเหมาคัน 4 ที่นั่ง') {
+                    seatSection.style.display = 'none';
+                    document.getElementById('seatCount').value = 1;
+                    updateTotalPrice();
+                } else {
+                    seatSection.style.display = 'block';
+                }
+            });
+            
+            window.addEventListener('load', async () => {
+                isLiffReady = false;
+                userProfile = { 
+                    userId: 'test_' + Date.now(), 
+                    displayName: 'ผู้ทดสอบระบบ' 
+                };
+                showDebug('🧪 TEST MODE - ไม่ต้องใช้ LINE');
+                document.getElementById('debugInfo').style.display = 'block';
+            });
         
         document.getElementById('submitBtn').addEventListener('click', async () => {
     ['dateGroup', 'nameGroup', 'phoneGroup', 'locationGroup', 'timeError', 'airlineGroup', 'flightTimeGroup'].forEach(clearError);
@@ -1379,6 +1399,7 @@ returnDatePicker.addEventListener('change', () => {
             const phone = document.getElementById('phone').value.trim();
             const location = document.getElementById('location').value.trim();
             const seatCount = parseInt(document.getElementById('seatCount').value) || 1;
+            const vehicleType = document.getElementById('vehicleType').value;
             
             let hasError = false;
             
@@ -1506,7 +1527,7 @@ returnDatePicker.addEventListener('change', () => {
                 try {
                     showDebug('กำลังสร้างข้อความ...');
                     
-                    let msg = `✅ รับคำขอเช็คที่นั่งรถตู้ลีมูซีนเรียบร้อยแล้วค่ะ\n━━━━━━━━━━━━━━━━\n📋 หมายเลขคำขอ: ${reqNum}\n\n🎫 ประเภท: ${tripType}`;
+                    let msg = `✅ รับคำขอเช็คที่นั่ง${vehicleType}เรียบร้อยแล้วค่ะ\n━━━━━━━━━━━━━━━━\n📋 หมายเลขคำขอ: ${reqNum}\n\n🎫 ประเภท: ${tripType}`;
                     
                     if (tripType === 'ไป-กลับ') {
                         msg += `\n\n🛫 ขาไป`;
@@ -1548,7 +1569,11 @@ returnDatePicker.addEventListener('change', () => {
                     }
                     
                     msg += `\n\n━━━━━━━━━━━━━━━━\n👤 ชื่อผู้จอง: ${customerName}\n📞 เบอร์โทร: ${phone}`;
-                    msg += `\n💺 จำนวนที่นั่ง: ${seatCount} ที่นั่ง`;
+                    if (vehicleType === 'รถเก๋งเหมาคัน 4 ที่นั่ง') {
+                        msg += `\n🚗 การจอง: เหมาคัน (4 ที่นั่ง)`;
+                    } else {
+                        msg += `\n💺 จำนวนที่นั่ง: ${seatCount} ที่นั่ง`;
+                    }
                     msg += `\n💰 ราคารวม: ${totalPrice.toLocaleString()} บาท`;
                     msg += `\n\n━━━━━━━━━━━━━━━━\n💬 เจ้าหน้าที่จะติดต่อกลับเพื่อยืนยันการจองโดยเร็วที่สุดค่ะ`;
                     
