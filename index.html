@@ -1592,7 +1592,7 @@ returnDatePicker.addEventListener('change', () => {
                                             }, 2000);
                                         } catch (lineError) {
                                             showDebug('⚠️ ไม่สามารถส่ง LINE Message');
-                                            showMessagePopup(popupMsg, reqNum);
+                                            showMessagePopup(popupMsg, reqNum, vehicleType);
                                         }
                                     } else {
                                         showDebug('⚠️ เปิดผ่าน Browser');
@@ -1609,13 +1609,13 @@ returnDatePicker.addEventListener('change', () => {
                             });
                 
 
-             function showMessagePopup(message, reqNum) {
+            function showMessagePopup(message, reqNum, vehicleType) {
                 const popup = document.createElement('div');
                 popup.className = 'message-popup active';
                 popup.innerHTML = `
                     <div class="message-box">
                         <div class="message-header">
-                            <h3>✅ บันทึกข้อมูลสำเร็จ!</h3>
+                            <h3>📋 คำขอจอง ${vehicleType}</h3>
                             <p style="font-size: 14px; margin-top: 5px;">หมายเลข: ${reqNum}</p>
                             <p style="font-size: 13px; margin-top: 10px; opacity: 0.9;">กรุณาคัดลอกข้อความด้านล่างและส่งไปยัง LINE <strong>@alhijrah</strong> เพื่อแจ้งให้เราทราบค่ะ</p>                        </div>
                         <div class="message-content">${message}</div>
