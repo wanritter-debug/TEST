@@ -1574,8 +1574,11 @@ returnDatePicker.addEventListener('change', () => {
                     } else {
                         msg += `\n💺 จำนวนที่นั่ง: ${seatCount} ที่นั่ง`;
                     }
-                    msg += `\n💰 ราคารวม: ${totalPrice.toLocaleString()} บาท`;
-                    msg += `\n\n━━━━━━━━━━━━━━━━\n💬 เจ้าหน้าที่จะติดต่อกลับเพื่อยืนยันการจองโดยเร็วที่สุดค่ะ`;
+                    if (vehicleType === 'รถเก๋งเหมาคัน 4 ที่นั่ง') {
+                        msg += `\n💰 ราคา: เจ้าหน้าที่จะแจ้งให้ทราบโดยเร็วที่สุดค่ะ`;
+                    } else {
+                        msg += `\n💰 ราคารวม: ${totalPrice.toLocaleString()} บาท`;
+                    }                    msg += `\n\n━━━━━━━━━━━━━━━━\n💬 เจ้าหน้าที่จะติดต่อกลับเพื่อยืนยันการจองโดยเร็วที่สุดค่ะ`;
                     
                     // TEST MODE - แค่แสดง popup
                                         showDebug('🧪 TEST MODE - แสดงข้อความที่จะส่ง');
