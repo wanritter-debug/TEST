@@ -1514,15 +1514,6 @@
                         setupReturnFreeTimeListeners();
                     }
                 });
-                    
-                    // PC: แสดง/ซ่อน input เวลาอิสระ
-                    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-                    if (!isMobile) {
-                        document.querySelectorAll('.desktop-time-select-free').forEach(el => el.style.display = isCar ? 'block' : 'none');
-                        document.getElementById('freeTime').style.display = isCar ? 'none' : 'block';
-                        setupFreeTimeListeners();
-                    }
-                });
                 
                 window.addEventListener('load', async () => {
                     let retries = 0;
@@ -1678,11 +1669,23 @@
                     hasError = true;
                 }
                 
-                if (!returnSelectedTime) {
+                if (!isCar && !returnSelectedTime) {
                     showError('returnTimeError');
                     hasError = true;
                 }
-                
+
+                const returnFreeTimeValue = isMobileCheck
+                    ? document.getElementById('returnFreeTime').value
+                    : (() => {
+                        const h = document.getElementById('returnFreeHour').value;
+                        const m = document.getElementById('returnFreeMinute').value;
+                        return (h && m) ? `${h}:${m}` : document.getElementById('returnFreeTime').value;
+                    })();
+                if (isCar && !returnFreeTimeValue) {
+                    showError('returnFreeTimeGroup', 'กรุณาระบุเวลาที่ต้องการขากลับ');
+                    hasError = true;
+                }
+                        
                 if (!returnAirline || returnAirline.trim().length === 0) {
                     showError('returnAirlineGroup', 'กรุณาระบุสายการบิน');
                     hasError = true;
@@ -1705,6 +1708,7 @@
                     departureTime: returnSelectedTime,
                     airline: returnAirline,
                     flightTime: returnFlightTime,
+                    location: returnLocation,  
                     freeTime: document.getElementById('returnFreeTime').value  
 
                 };
