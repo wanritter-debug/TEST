@@ -739,12 +739,12 @@
                             <div class="section-title" id="outboundRouteTitle">🚐 เลือกเส้นทาง</div>
                             <div class="route-selector">
                                 <div class="route-option active" onclick="selectRoute('pattani-airport')">
-                                    <input type="radio" id="pattani-airport" name="route" value="ปัตตานี → สนามบิน 🛫" checked>
-                                    <label for="pattani-airport">ปัตตานี → สนามบิน 🛫</label>
+                                    <input type="radio" id="pattani-airport" name="route" value="ปัตตานี → สนามบิน" checked>
+                                    <label for="pattani-airport">ปัตตานี → สนามบิน</label>
                                 </div>
                                 <div class="route-option" onclick="selectRoute('airport-pattani')">
-                                    <input type="radio" id="airport-pattani" name="route" value="🛬 สนามบิน → ปัตตานี">
-                                    <label for="airport-pattani">🛬 สนามบิน → ปัตตานี</label>
+                                    <input type="radio" id="airport-pattani" name="route" value="สนามบิน → ปัตตานี">
+                                    <label for="airport-pattani">สนามบิน → ปัตตานี</label>
                                 </div>
                             </div>
                         </div>
@@ -793,8 +793,8 @@
                     <small class="error">กรุณาระบุสายการบิน</small>
                 </div>
                 <div class="input-group" id="flightTimeGroup">
-                     <label id="flightTimeLabel">เวลาขึ้นเครื่อง</label>
-                     
+                    <label id="flightTimeLabel">🛫 เวลาขึ้นเครื่อง</label>
+                    
                      <!-- สำหรับมือถือ - Time Picker -->
                      <input type="time" id="flightTime" class="mobile-time-picker" step="60">
                      
@@ -866,7 +866,7 @@
                             <small class="error">กรุณาระบุสายการบิน</small>
                          </div>
                         <div class="input-group" id="returnFlightTimeGroup">
-                            <label id="returnFlightTimeLabel">เวลาลงเครื่อง</label>
+                            <label id="returnFlightTimeLabel">🛬 เวลาลงเครื่อง</label>
                             
                             <!-- สำหรับมือถือ - Time Picker -->
                             <input type="time" id="returnFlightTime" class="mobile-time-picker" step="60">
@@ -1144,13 +1144,13 @@
                     const locationInput = document.getElementById('location');  // ← เพิ่มบรรทัดนี้
                     
                     if (routeId === 'pattani-airport') {
-                        flightTimeLabel.textContent = 'เวลาขึ้นเครื่อง';
+                        flightTimeLabel.textContent = '🛫 เวลาขึ้นเครื่อง';
                         flightTimeHint.textContent = 'ระบุเวลาที่เครื่องบินขึ้น';
                         locationTitle.textContent = '📍 จุดรับ';
                         locationInput.placeholder = 'ระบุที่อยู่หรือจุดรับในปัตตานี';
                         locationInput.setAttribute('required', 'required');
                     } else {
-                        flightTimeLabel.textContent = 'เวลาลงเครื่อง';
+                        flightTimeLabel.textContent = '🛬 เวลาลงเครื่อง';
                         flightTimeHint.textContent = 'ระบุเวลาที่เครื่องบินลง';
                         locationTitle.textContent = '📍 จุดส่ง';
                         locationInput.placeholder = 'ระบุที่อยู่หรือจุดหมายปลายทางในปัตตานี';
@@ -1183,13 +1183,13 @@
                     const actualRoute = routeId.replace('return-', '');
                     
                     if (actualRoute === 'pattani-airport') {
-                        returnFlightTimeLabel.textContent = 'เวลาขึ้นเครื่อง';
+                        returnFlightTimeLabel.textContent = '🛫 เวลาขึ้นเครื่อง';
                         returnFlightTimeHint.textContent = 'ระบุเวลาที่เครื่องบินขึ้น';
                         returnLocationTitle.textContent = '📍 จุดรับ';
                         returnLocationInput.placeholder = 'ระบุที่อยู่หรือจุดรับในปัตตานี';
                         returnLocationInput.setAttribute('required', 'required');
                     } else {
-                        returnFlightTimeLabel.textContent = 'เวลาลงเครื่อง';
+                        returnFlightTimeLabel.textContent = '🛬 เวลาลงเครื่อง';
                         returnFlightTimeHint.textContent = 'ระบุเวลาที่เครื่องบินลง';
                         returnLocationTitle.textContent = '📍 จุดส่ง';
                         returnLocationInput.placeholder = 'ระบุที่อยู่หรือจุดหมายปลายทางในปัตตานี';
@@ -1710,7 +1710,7 @@
                                                 })();
                                             msgBody += `\n🕐 เวลาที่ต้องการ: ${displayFreeTime} น.`;
                                         } else {
-                                            msgBody += `\n➡️ รอบเดินทาง: ${selectedTime} น.`;
+                                            msgBody += `\n🕐 รอบเดินทาง: ${selectedTime} น.`;
                                         }
                     
                                         if (airline && airline !== 'ไม่ระบุ') {
@@ -1718,8 +1718,8 @@
                                         }
                     
                                         if (flightTime && flightTime !== 'ไม่ระบุ') {
-                                            const timeLabel = route.includes('สนามบิน →') ? 'เวลาลงเครื่อง' : 'เวลาขึ้นเครื่อง';
-                                            msgBody += `\n🕐 ${timeLabel}: ${flightTime} น.`;
+                                            const timeLabel = route.includes('สนามบิน →') ? '🛬 เวลาลงเครื่อง' : '🛫 เวลาขึ้นเครื่อง';
+                                            msgBody += `\n${timeLabel}: ${flightTime} น.`;
                                         }
                     
                                         const locationLabel = route.includes('สนามบิน →') ? 'จุดส่ง' : 'จุดรับ';
@@ -1729,15 +1729,15 @@
                                             msgBody += `\n\n🛬 ขากลับ`;
                                             msgBody += `\n🛣️ เส้นทาง: ${returnData.route}`;
                                             msgBody += `\n🗓️ วันที่: ${returnData.travelDate}`;
-                                            msgBody += `\n⬅️ รอบเดินทาง: ${returnData.departureTime} น.`;
+                                            msgBody += `\n🕐 รอบเดินทาง: ${returnData.departureTime} น.`;
                     
                                             if (returnData.airline && returnData.airline !== 'ไม่ระบุ') {
                                                 msgBody += `\n✈️ สายการบิน: ${returnData.airline}`;
                                             }
                     
                                             if (returnData.flightTime && returnData.flightTime !== 'ไม่ระบุ') {
-                                                const timeLabel = returnData.route.includes('สนามบิน →') ? 'เวลาลงเครื่อง' : 'เวลาขึ้นเครื่อง';
-                                                msgBody += `\n🕐 ${timeLabel}: ${returnData.flightTime} น.`;
+                                                const timeLabel = returnData.route.includes('สนามบิน →') ? '🛬 เวลาลงเครื่อง' : '🛫 เวลาขึ้นเครื่อง';
+                                                msgBody += `\n${timeLabel}: ${returnData.flightTime} น.`;
                                             }
                     
                                             const returnLocationLabel = returnData.route.includes('สนามบิน →') ? 'จุดส่ง' : 'จุดรับ';
