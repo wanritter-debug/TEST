@@ -1120,7 +1120,7 @@
                     const outboundTimeTitle = document.getElementById('outboundTimeTitle');
                     const outboundFlightTitle = document.getElementById('outboundFlightTitle');
                     
-                    if (type === 'roundtrip') {
+                        if (type === 'roundtrip') {
                         returnSection.style.display = 'block';
                         
                         const isCar = document.getElementById('vehicleType').value === 'รถเก๋งเหมาคัน 4 ที่นั่ง';
@@ -1133,7 +1133,37 @@
                             seatInput.value = 2;
                             seatInput.min = 2;
                         }
-                        ...
+                        
+                        outboundDateTitle.textContent = '📅 วันที่เดินทาง (ขาไป)';
+                        outboundRouteTitle.textContent = '🚐 เลือกเส้นทาง (ขาไป)';
+                        outboundTimeTitle.textContent = '🕐 เลือกรอบเดินทาง (ขาไป)';
+                        outboundFlightTitle.textContent = '✈️ ข้อมูลเที่ยวบิน (ขาไป)';
+                        
+                        const outboundRoute = document.querySelector('input[name="route"]:checked').value;
+                        if (outboundRoute.includes('ปัตตานี → สนามบิน')) {
+                            selectReturnRoute('return-airport-pattani');
+                        } else {
+                            selectReturnRoute('return-pattani-airport');
+                        }
+                    } else {
+                        returnSection.style.display = 'none';
+                        
+                        const isCar = document.getElementById('vehicleType').value === 'รถเก๋งเหมาคัน 4 ที่นั่ง';
+                        if (isCar) {
+                            document.getElementById('carCount').value = 1;
+                            document.getElementById('carCount').min = 1;
+                            document.getElementById('returnFreeTimeSection').style.display = 'none';
+                        } else {
+                            seatInput.value = 1;
+                            seatInput.min = 1;
+                        }
+                        
+                        outboundDateTitle.textContent = '📅 วันที่เดินทาง';
+                        outboundRouteTitle.textContent = '🚐 เลือกเส้นทาง';
+                        outboundTimeTitle.textContent = '🕐 เลือกรอบเดินทาง';
+                        outboundFlightTitle.textContent = '✈️ ข้อมูลเที่ยวบิน';
+                    }
+                    
                     } else {
                         returnSection.style.display = 'none';
                         
