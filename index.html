@@ -849,6 +849,22 @@
                     <small class="error" id="returnTimeError" style="display: none; margin-top: 10px;">กรุณาเลือกรอบเดินทางขากลับ</small>
                 </div>
 
+                <div class="section" id="returnFreeTimeSection" style="display: none;">
+                    <div class="section-title">🕐 เวลาที่ต้องการ (ขากลับ)</div>
+                    <div class="input-group" id="returnFreeTimeGroup">
+                        <label>ระบุเวลาที่ต้องการรถขากลับ</label>
+                        <input type="time" id="returnFreeTime" class="mobile-time-picker" step="60" style="display: block;">
+                        <div class="desktop-time-select-free-return" style="display: none;">
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="text" id="returnFreeHour" placeholder="ชั่วโมง (00-23)" maxlength="2" style="flex: 1; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 16px; text-align: center;">
+                                <span style="font-size: 20px; font-weight: bold;">:</span>
+                                <input type="text" id="returnFreeMinute" placeholder="นาที (00-59)" maxlength="2" style="flex: 1; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 16px; text-align: center;">
+                            </div>
+                        </div>
+                        <small class="error">กรุณาระบุเวลา</small>
+                    </div>
+                </div>
+                
                 <div class="section">
                     <div class="section-title" id="returnLocationTitle">📍 จุดส่ง</div>
                     <div class="input-group" id="returnLocationGroup">
@@ -1106,29 +1122,31 @@
                     
                     if (type === 'roundtrip') {
                         returnSection.style.display = 'block';
-                        seatInput.value = 2;
-                        seatInput.min = 2;
                         
-                        outboundDateTitle.textContent = '📅 วันที่เดินทาง (ขาไป)';
-                        outboundRouteTitle.textContent = '🚐 เลือกเส้นทาง (ขาไป)';
-                        outboundTimeTitle.textContent = '🕐 เลือกรอบเดินทาง (ขาไป)';
-                        outboundFlightTitle.textContent = '✈️ ข้อมูลเที่ยวบิน (ขาไป)';
-                        
-                        const outboundRoute = document.querySelector('input[name="route"]:checked').value;
-                        if (outboundRoute.includes('ปัตตานี → สนามบิน')) {
-                            selectReturnRoute('return-airport-pattani');
+                        const isCar = document.getElementById('vehicleType').value === 'รถเก๋งเหมาคัน 4 ที่นั่ง';
+                        if (isCar) {
+                            document.getElementById('carCount').value = 2;
+                            document.getElementById('carCount').min = 2;
+                            document.getElementById('returnFreeTimeSection').style.display = 'block';
+                            document.getElementById('returnTimeSlotContainer').closest('.section').style.display = 'none';
                         } else {
-                            selectReturnRoute('return-pattani-airport');
+                            seatInput.value = 2;
+                            seatInput.min = 2;
                         }
+                        ...
                     } else {
                         returnSection.style.display = 'none';
-                        seatInput.value = 1;
-                        seatInput.min = 1;
                         
-                        outboundDateTitle.textContent = '📅 วันที่เดินทาง';
-                        outboundRouteTitle.textContent = '🚐 เลือกเส้นทาง';
-                        outboundTimeTitle.textContent = '🕐 เลือกรอบเดินทาง';
-                        outboundFlightTitle.textContent = '✈️ ข้อมูลเที่ยวบิน';
+                        const isCar = document.getElementById('vehicleType').value === 'รถเก๋งเหมาคัน 4 ที่นั่ง';
+                        if (isCar) {
+                            document.getElementById('carCount').value = 1;
+                            document.getElementById('carCount').min = 1;
+                            document.getElementById('returnFreeTimeSection').style.display = 'none';
+                        } else {
+                            seatInput.value = 1;
+                            seatInput.min = 1;
+                        }
+                        ...
                     }
                     updateTotalPrice();
                 }
@@ -1334,6 +1352,38 @@
                     document.getElementById('freeTime').value = `${hour}:${minute}`;
                 }
             }
+
+            function setupReturnFreeTimeListeners() {
+            const returnFreeHour = document.getElementById('returnFreeHour');
+            const returnFreeMinute = document.getElementById('returnFreeMinute');
+            if (returnFreeHour._listenerAdded) return;
+            returnFreeHour._listenerAdded = true;
+            
+            returnFreeHour.addEventListener('input', function(e) {
+                e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                updateReturnFreeTimeFromInput();
+            });
+            returnFreeMinute.addEventListener('input', function(e) {
+                e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                updateReturnFreeTimeFromInput();
+            });
+        }
+        
+        function updateReturnFreeTimeFromInput() {
+            let hour = document.getElementById('returnFreeHour').value;
+            let minute = document.getElementById('returnFreeMinute').value;
+            if (hour.length === 2) {
+                hour = String(Math.min(Math.max(parseInt(hour), 0), 23)).padStart(2, '0');
+                document.getElementById('returnFreeHour').value = hour;
+            }
+            if (minute.length === 2) {
+                minute = String(Math.min(Math.max(parseInt(minute), 0), 59)).padStart(2, '0');
+                document.getElementById('returnFreeMinute').value = minute;
+            }
+            if (hour.length === 2 && minute.length === 2) {
+                document.getElementById('returnFreeTime').value = `${hour}:${minute}`;
+            }
+        }
                     
                         // ตรวจสอบว่าเป็น PC หรือมือถือ
                 function detectDevice() {
@@ -1438,10 +1488,32 @@
         
                 document.getElementById('vehicleType').addEventListener('change', function() {
                     const isCar = this.value === 'รถเก๋งเหมาคัน 4 ที่นั่ง';
+                    const tripType = document.querySelector('input[name="tripType"]:checked').value;
+                    
                     document.getElementById('seatSection').style.display = isCar ? 'none' : 'block';
                     document.getElementById('carCountSection').style.display = isCar ? 'block' : 'none';
                     document.getElementById('freeTimeSection').style.display = isCar ? 'block' : 'none';
                     document.getElementById('timeSlotSectionWrapper').style.display = isCar ? 'none' : 'block';
+                    
+                    // ขากลับ
+                    document.getElementById('returnFreeTimeSection').style.display = (isCar && tripType === 'ไป-กลับ') ? 'block' : 'none';
+                    document.getElementById('returnTimeSlotContainer').closest('.section').style.display = (isCar && tripType === 'ไป-กลับ') ? 'none' : 'block';
+                    
+                    // จำนวนคัน
+                    if (isCar) {
+                        document.getElementById('carCount').value = tripType === 'ไป-กลับ' ? 2 : 1;
+                        document.getElementById('carCount').min = tripType === 'ไป-กลับ' ? 2 : 1;
+                    }
+                    
+                    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                    if (!isMobile) {
+                        document.querySelectorAll('.desktop-time-select-free').forEach(el => el.style.display = isCar ? 'block' : 'none');
+                        document.querySelectorAll('.desktop-time-select-free-return').forEach(el => el.style.display = (isCar && tripType === 'ไป-กลับ') ? 'block' : 'none');
+                        document.getElementById('freeTime').style.display = isCar ? 'none' : 'block';
+                        setupFreeTimeListeners();
+                        setupReturnFreeTimeListeners();
+                    }
+                });
                     
                     // PC: แสดง/ซ่อน input เวลาอิสระ
                     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -1633,7 +1705,8 @@
                     departureTime: returnSelectedTime,
                     airline: returnAirline,
                     flightTime: returnFlightTime,
-                    location: returnLocation
+                    freeTime: document.getElementById('returnFreeTime').value  
+
                 };
                 }
             }
@@ -1729,8 +1802,12 @@
                                             msgBody += `\n\n🛬 ขากลับ`;
                                             msgBody += `\n🛣️ เส้นทาง: ${returnData.route}`;
                                             msgBody += `\n🗓️ วันที่: ${returnData.travelDate}`;
-                                            msgBody += `\n🕐 รอบเดินทาง: ${returnData.departureTime} น.`;
-                    
+                                            if (isCar) {
+                                                msgBody += `\n🕐 เวลาที่ต้องการ: ${returnData.freeTime} น.`;
+                                            } else {
+                                                msgBody += `\n🕐 รอบเดินทาง: ${returnData.departureTime} น.`;
+                                            }
+                        
                                             if (returnData.airline && returnData.airline !== 'ไม่ระบุ') {
                                                 msgBody += `\n✈️ สายการบิน: ${returnData.airline}`;
                                             }
