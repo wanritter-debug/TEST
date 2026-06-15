@@ -1562,7 +1562,15 @@
                         showError('timeError');
                         hasError = true;
                     }
-                    if (isCar && !freeTime) {
+                    const isMobileCheck = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                    const freeTimeValue = isMobileCheck
+                        ? freeTime
+                        : (() => {
+                            const h = document.getElementById('freeHour').value;
+                            const m = document.getElementById('freeMinute').value;
+                            return (h && m) ? `${h}:${m}` : freeTime;
+                        })();
+                    if (isCar && !freeTimeValue) {
                         showError('freeTimeGroup', 'กรุณาระบุเวลาที่ต้องการ');
                         hasError = true;
                     }
@@ -1664,118 +1672,118 @@
                     returnData: returnData
                 };
                 
-                showLoading(true);
-                showDebug('กำลังส่งข้อมูล...');
-            
-
-                try {
-                                    showDebug('กำลังสร้างข้อความ...');
-                                    
-                                    // === header สำหรับป๊อปอัพ (เปิดผ่านคอม) ===
-                                    const popupHeader = vehicleType === 'รถเก๋งเหมาคัน 4 ที่นั่ง'
-                                        ? `📋 คำขอจอง ${vehicleType}\nกรุณาคัดลอกข้อความนี้ส่งไปยัง LINE @alhijrah`
-                                        : `📋 คำขอจองเช็คที่นั่ง${vehicleType}\nกรุณาคัดลอกข้อความนี้ส่งไปยัง LINE @alhijrah`;
-                
-                                    // === header สำหรับ LINE (ส่งอัตโนมัติ) ===
-                                    const lineHeader = vehicleType === 'รถเก๋งเหมาคัน 4 ที่นั่ง'
-                                        ? `✅ รับคำขอจองรถเก๋งเหมาคันเรียบร้อยแล้วค่ะ`
-                                        : `✅ รับคำขอเช็คที่นั่งรถตู้ลีมูซีนเรียบร้อยแล้วค่ะ`;
-                
-                                    // === สร้าง body ข้อความ (ใช้ร่วมกัน) ===
-                                    let msgBody = `\n━━━━━━━━━━━━━━━━\n📋 หมายเลขคำขอ: ${reqNum}\n\n🎫 ประเภท: ${tripType}\n🚗 ประเภทรถ: ${vehicleType}`;
-                                                        
-                                    if (tripType === 'ไป-กลับ') {
-                                        msgBody += `\n\n🛫 ขาไป`;
-                                    }
-                                    
-                                    msgBody += `\n🚐 เส้นทาง: ${route}`;
-                                    msgBody += `\n📅 วันที่: ${travelDateThai}`;
-                                    if (isCar) {
-                                        msgBody += `\n🕐 เวลาที่ต้องการ: ${freeTime} น.`;
-                                    } else {
-                                        msgBody += `\n🕐 รอบเดินทาง: ${selectedTime} น.`;
-                                    }             
+                    showLoading(true);
+                                    showDebug('กำลังส่งข้อมูล...');
                     
-                                    if (airline && airline !== 'ไม่ระบุ') {
-                                        msgBody += `\n✈️ สายการบิน: ${airline}`;
-                                    }
-                                    
-                                    if (flightTime && flightTime !== 'ไม่ระบุ') {
-                                        const timeLabel = route.includes('สนามบิน →') ? 'เวลาลงเครื่อง' : 'เวลาขึ้นเครื่อง';
-                                        msgBody += `\n🕐 ${timeLabel}: ${flightTime} น.`;
-                                    }
-                                    
-                                    const locationLabel = route.includes('สนามบิน →') ? 'จุดส่ง' : 'จุดรับ';
-                                    msgBody += `\n📍 ${locationLabel}: ${location}`;
-                                    
-                                    if (returnData) {
-                                        msgBody += `\n\n🛬 ขากลับ`;
-                                        msgBody += `\n🚐 เส้นทาง: ${returnData.route}`;
-                                        msgBody += `\n📅 วันที่: ${returnData.travelDate}`;
-                                        msgBody += `\n🕐 รอบเดินทาง: ${returnData.departureTime} น.`;
-                                        
-                                        if (returnData.airline && returnData.airline !== 'ไม่ระบุ') {
-                                            msgBody += `\n✈️ สายการบิน: ${returnData.airline}`;
+                                    try {
+                                        showDebug('กำลังสร้างข้อความ...');
+                    
+                                        // === header สำหรับป๊อปอัพ (เปิดผ่านคอม) ===
+                                        const popupHeader = isCar
+                                            ? `📋 คำขอจอง ${vehicleType}\nกรุณาคัดลอกข้อความนี้ส่งไปยัง LINE @alhijrah`
+                                            : `📋 คำขอจองเช็คที่นั่ง${vehicleType}\nกรุณาคัดลอกข้อความนี้ส่งไปยัง LINE @alhijrah`;
+                    
+                                        // === header สำหรับ LINE (ส่งอัตโนมัติ) ===
+                                        const lineHeader = isCar
+                                            ? `✅ รับคำขอจองรถเก๋งเหมาคันเรียบร้อยแล้วค่ะ`
+                                            : `✅ รับคำขอเช็คที่นั่งรถตู้ลีมูซีนเรียบร้อยแล้วค่ะ`;
+                    
+                                        // === สร้าง body ข้อความ ===
+                                        let msgBody = `\n━━━━━━━━━━━━━━━━\n📋 หมายเลขคำขอ: ${reqNum}\n\n🎫 ประเภท: ${tripType}\n🚗 ประเภทรถ: ${vehicleType}`;
+                    
+                                        if (tripType === 'ไป-กลับ') {
+                                            msgBody += `\n\n🛫 ขาไป`;
                                         }
-                                        
-                                        if (returnData.flightTime && returnData.flightTime !== 'ไม่ระบุ') {
-                                            const timeLabel = returnData.route.includes('สนามบิน →') ? 'เวลาลงเครื่อง' : 'เวลาขึ้นเครื่อง';
-                                            msgBody += `\n🕐 ${timeLabel}: ${returnData.flightTime} น.`;
+                    
+                                        msgBody += `\n🚐 เส้นทาง: ${route}`;
+                                        msgBody += `\n📅 วันที่: ${travelDateThai}`;
+                    
+                                        if (isCar) {
+                                            // PC ใช้ freeHour/freeMinute, มือถือใช้ freeTime
+                                            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                                            const displayFreeTime = isMobile
+                                                ? freeTime
+                                                : (() => {
+                                                    const h = document.getElementById('freeHour').value;
+                                                    const m = document.getElementById('freeMinute').value;
+                                                    return (h && m) ? `${h}:${m}` : freeTime;
+                                                })();
+                                            msgBody += `\n🕐 เวลาที่ต้องการ: ${displayFreeTime} น.`;
+                                        } else {
+                                            msgBody += `\n🕐 รอบเดินทาง: ${selectedTime} น.`;
                                         }
-                                        
-                                        const returnLocationLabel = returnData.route.includes('สนามบิน →') ? 'จุดส่ง' : 'จุดรับ';
-                                        msgBody += `\n📍 ${returnLocationLabel}: ${returnData.location}`;
-                                    }
-                                    
-                                    msgBody += `\n\n━━━━━━━━━━━━━━━━\n👤 ชื่อผู้จอง: ${customerName}\n📞 เบอร์โทร: ${phone}`;
                     
-                                    if (isCar) {
-                                        msgBody += `\n🚗 จำนวนคัน: ${carCount} คัน`;
-                                        msgBody += `\n💰 ราคา: เจ้าหน้าที่จะแจ้งให้ทราบโดยเร็วที่สุดค่ะ`;
-                                    } else {
-                                        msgBody += `\n💺 จำนวนที่นั่ง: ${seatCount} ที่นั่ง`;
-                                        msgBody += `\n💰 ราคารวม: ${totalPrice.toLocaleString()} บาท`;
-                                    }
+                                        if (airline && airline !== 'ไม่ระบุ') {
+                                            msgBody += `\n✈️ สายการบิน: ${airline}`;
+                                        }
                     
-                                    msgBody += `\n\n━━━━━━━━━━━━━━━━\n💬 เจ้าหน้าที่จะติดต่อกลับเพื่อยืนยันการจองโดยเร็วที่สุดค่ะ`;
-                
-                                    // ประกอบข้อความแยกตามช่องทาง
-                                    const msg = `${popupHeader}${msgBody}`;       // สำหรับป๊อปอัพคอม
-                                    const lineMsg = `${lineHeader}${msgBody}`;    // สำหรับส่ง LINE อัตโนมัติ
-                                        
+                                        if (flightTime && flightTime !== 'ไม่ระบุ') {
+                                            const timeLabel = route.includes('สนามบิน →') ? 'เวลาลงเครื่อง' : 'เวลาขึ้นเครื่อง';
+                                            msgBody += `\n🕐 ${timeLabel}: ${flightTime} น.`;
+                                        }
+                    
+                                        const locationLabel = route.includes('สนามบิน →') ? 'จุดส่ง' : 'จุดรับ';
+                                        msgBody += `\n📍 ${locationLabel}: ${location}`;
+                    
+                                        if (returnData) {
+                                            msgBody += `\n\n🛬 ขากลับ`;
+                                            msgBody += `\n🚐 เส้นทาง: ${returnData.route}`;
+                                            msgBody += `\n📅 วันที่: ${returnData.travelDate}`;
+                                            msgBody += `\n🕐 รอบเดินทาง: ${returnData.departureTime} น.`;
+                    
+                                            if (returnData.airline && returnData.airline !== 'ไม่ระบุ') {
+                                                msgBody += `\n✈️ สายการบิน: ${returnData.airline}`;
+                                            }
+                    
+                                            if (returnData.flightTime && returnData.flightTime !== 'ไม่ระบุ') {
+                                                const timeLabel = returnData.route.includes('สนามบิน →') ? 'เวลาลงเครื่อง' : 'เวลาขึ้นเครื่อง';
+                                                msgBody += `\n🕐 ${timeLabel}: ${returnData.flightTime} น.`;
+                                            }
+                    
+                                            const returnLocationLabel = returnData.route.includes('สนามบิน →') ? 'จุดส่ง' : 'จุดรับ';
+                                            msgBody += `\n📍 ${returnLocationLabel}: ${returnData.location}`;
+                                        }
+                    
+                                        msgBody += `\n\n━━━━━━━━━━━━━━━━\n👤 ชื่อผู้จอง: ${customerName}\n📞 เบอร์โทร: ${phone}`;
+                    
+                                        if (isCar) {
+                                            msgBody += `\n🚗 จำนวนคัน: ${carCount} คัน`;
+                                            msgBody += `\n💰 ราคา: เจ้าหน้าที่จะแจ้งให้ทราบโดยเร็วที่สุดค่ะ`;
+                                        } else {
+                                            msgBody += `\n💺 จำนวนที่นั่ง: ${seatCount} ที่นั่ง`;
+                                            msgBody += `\n💰 ราคารวม: ${totalPrice.toLocaleString()} บาท`;
+                                        }
+                    
+                                        msgBody += `\n\n━━━━━━━━━━━━━━━━\n💬 เจ้าหน้าที่จะติดต่อกลับเพื่อยืนยันการจองโดยเร็วที่สุดค่ะ`;
+                    
+                                        const msg = `${popupHeader}${msgBody}`;
+                                        const lineMsg = `${lineHeader}${msgBody}`;
+                    
                                         if (typeof liff !== 'undefined' && liff.isLoggedIn()) {
                                             try {
-                                                await liff.sendMessages([{
-                                                    type: 'text',
-                                                    text: lineMsg
-                                                }]);
-                                            showDebug('✅ ส่งข้อความ LINE สำเร็จ');
-                                            showMessage('success', `✅ จองสำเร็จ! หมายเลข: ${reqNum}`);
-                                            
-                                            setTimeout(() => {
-                                                if (liff.isInClient()) {
-                                                    liff.closeWindow();
-                                                }
-                                            }, 2000);
-                                        } catch (lineError) {
-                                
-                            showDebug('⚠️ ไม่สามารถส่ง LINE Message');
-                            showMessagePopup(msg, reqNum, vehicleType);
-                        }
-                    } else {
-                        showDebug('⚠️ เปิดผ่าน Browser - แสดงข้อความให้ copy');
-                        showMessagePopup(msg, reqNum, vehicleType);
-                    }
+                                                await liff.sendMessages([{ type: 'text', text: lineMsg }]);
+                                                showDebug('✅ ส่งข้อความ LINE สำเร็จ');
+                                                showMessage('success', `✅ จองสำเร็จ! หมายเลข: ${reqNum}`);
+                                                setTimeout(() => {
+                                                    if (liff.isInClient()) liff.closeWindow();
+                                                }, 2000);
+                                            } catch (lineError) {
+                                                showDebug('⚠️ ไม่สามารถส่ง LINE Message');
+                                                showMessagePopup(msg, reqNum, vehicleType);
+                                            }
+                                        } else {
+                                            showDebug('⚠️ เปิดผ่าน Browser - แสดงข้อความให้ copy');
+                                            showMessagePopup(msg, reqNum, vehicleType);
+                                        }
                     
-               
-                } catch (lineError) {
-                        console.error('LINE Error:', lineError);
-                        showDebug(`⚠️ LINE Error: ${lineError.message}`);
-                        showMessage('success', `✅ บันทึกข้อมูลสำเร็จ! หมายเลข: ${reqNum}`);
-                    }
-                    
-                    showLoading(false);
-            });
+                                    } catch (err) {
+                                        console.error('Error:', err);
+                                        showDebug(`⚠️ Error: ${err.message}`);
+                                        showMessage('error', `❌ เกิดข้อผิดพลาด: ${err.message}`);
+                                    } finally {
+                                        showLoading(false);  // ✅ ย้ายมาใส่ finally เสมอ
+                                    }
+                                });
                 
 
             function showMessagePopup(message, reqNum, vehicleType) {
