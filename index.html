@@ -1710,7 +1710,7 @@
                                                 })();
                                             msgBody += `\n🕐 เวลาที่ต้องการ: ${displayFreeTime} น.`;
                                         } else {
-                                            msgBody += `\n🚌 รอบเดินทาง: ${selectedTime} น.`;
+                                            msgBody += `\n➡️ รอบเดินทาง: ${selectedTime} น.`;
                                         }
                     
                                         if (airline && airline !== 'ไม่ระบุ') {
@@ -1729,7 +1729,7 @@
                                             msgBody += `\n\n🛬 ขากลับ`;
                                             msgBody += `\n🛣️ เส้นทาง: ${returnData.route}`;
                                             msgBody += `\n🗓️ วันที่: ${returnData.travelDate}`;
-                                            msgBody += `\n🕐 รอบเดินทาง: ${returnData.departureTime} น.`;
+                                            msgBody += `\n⬅️ รอบเดินทาง: ${returnData.departureTime} น.`;
                     
                                             if (returnData.airline && returnData.airline !== 'ไม่ระบุ') {
                                                 msgBody += `\n✈️ สายการบิน: ${returnData.airline}`;
