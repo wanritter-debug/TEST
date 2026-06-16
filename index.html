@@ -721,7 +721,7 @@
                 <div class="input-group">
                     <select id="vehicleType">
                         <option value="รถตู้ลีมูซีน">รถตู้ลีมูซีน</option>
-                        <option value="รถเก๋งเหมาคัน 4 ที่นั่ง">รถเก๋งเหมาคัน (4 ที่นั่ง)</option>
+                        <option value="รถเก๋งเหมาคัน 3 ที่นั่ง">รถเก๋งเหมาคัน (3 ที่นั่ง)</option>
                     </select>
                 </div>
             </div>
@@ -936,7 +936,7 @@
                     <div class="input-group">
                         <label>จำนวนคันที่ต้องการจอง</label>
                         <input type="number" id="carCount" min="1" value="1" style="text-align: center; font-size: 18px; font-weight: bold;">
-                        <small>ราคาเจ้าหน้าที่จะแจ้งให้ทราบโดยเร็วที่สุดค่ะ</small>
+                        <small>ราคา 1,200 บาท/คัน</small>
                     </div>
                 </div>
             
@@ -1123,7 +1123,7 @@
                     if (type === 'roundtrip') {
                         returnSection.style.display = 'block';
                         
-                        const isCar = document.getElementById('vehicleType').value === 'รถเก๋งเหมาคัน 4 ที่นั่ง';
+                        const isCar = document.getElementById('vehicleType').value === 'รถเก๋งเหมาคัน 3 ที่นั่ง';
                         if (isCar) {
                             document.getElementById('carCount').value = 2;
                             document.getElementById('carCount').min = 2;
@@ -1153,7 +1153,7 @@
                     } else {
                         returnSection.style.display = 'none';
                         
-                        const isCar = document.getElementById('vehicleType').value === 'รถเก๋งเหมาคัน 4 ที่นั่ง';
+                        const isCar = document.getElementById('vehicleType').value === 'รถเก๋งเหมาคัน 3 ที่นั่ง';
                         if (isCar) {
                             document.getElementById('carCount').value = 1;
                             document.getElementById('carCount').min = 1;
@@ -1510,15 +1510,34 @@
                 renderTimeSlots('pattani-airport');
                 renderReturnTimeSlots('airport-pattani');
                 selectTripType('oneway');
+                // ซิงค์สถานะ route option ตาม vehicleType ปัจจุบัน
+                const initVehicle = document.getElementById('vehicleType').value;
+                if (initVehicle === 'รถเก๋งเหมาคัน 3 ที่นั่ง') {
+                    document.querySelector('[onclick="selectRoute(\'airport-pattani\')"]').style.display = 'none';
+                    document.querySelector('[onclick="selectTripType(\'roundtrip\')"]').style.display = 'none';
+                }
         
                 document.getElementById('vehicleType').addEventListener('change', function() {
-                    const isCar = this.value === 'รถเก๋งเหมาคัน 4 ที่นั่ง';
+                    const isCar = this.value === 'รถเก๋งเหมาคัน 3 ที่นั่ง';
                     const tripType = document.querySelector('input[name="tripType"]:checked').value;
                     
                     document.getElementById('seatSection').style.display = isCar ? 'none' : 'block';
                     document.getElementById('carCountSection').style.display = isCar ? 'block' : 'none';
                     document.getElementById('freeTimeSection').style.display = isCar ? 'block' : 'none';
                     document.getElementById('timeSlotSectionWrapper').style.display = isCar ? 'none' : 'block';
+
+                    // ซ่อน/แสดง ตัวเลือกไป-กลับ
+                    const roundtripOption = document.querySelector('[onclick="selectTripType(\'roundtrip\')"]');
+                    if (isCar) {
+                        roundtripOption.style.display = 'none';
+                        selectTripType('oneway');
+                        // บังคับเส้นทางเป็น ปัตตานี → สนามบิน เท่านั้น
+                        selectRoute('pattani-airport');
+                        document.querySelector('[onclick="selectRoute(\'airport-pattani\')"]').style.display = 'none';
+                    } else {
+                        roundtripOption.style.display = 'block';
+                        document.querySelector('[onclick="selectRoute(\'airport-pattani\')"]').style.display = 'block';
+                    }
                     
                     // ขากลับ
                     document.getElementById('returnFreeTimeSection').style.display = (isCar && tripType === 'ไป-กลับ') ? 'block' : 'none';
@@ -1631,7 +1650,7 @@
                     const phone = document.getElementById('phone').value.trim();
                     const location = document.getElementById('location').value.trim();
                     const vehicleType = document.getElementById('vehicleType').value;
-                    const isCar = vehicleType === 'รถเก๋งเหมาคัน 4 ที่นั่ง';
+                    const isCar = vehicleType === 'รถเก๋งเหมาคัน 3 ที่นั่ง';
                     const seatCount = parseInt(document.getElementById('seatCount').value) || 1;
                     const carCount = parseInt(document.getElementById('carCount').value) || 1;
                     const freeTime = document.getElementById('freeTime').value;
@@ -1867,7 +1886,8 @@
                     
                                         if (isCar) {
                                             msgBody += `\n🚗 จำนวนคัน: ${carCount} คัน`;
-                                            msgBody += `\n💰 ราคา: เจ้าหน้าที่จะแจ้งให้ทราบโดยเร็วที่สุดค่ะ`;
+                                        const carTotal = carCount * 1200;
+                                        msgBody += `\n💰 ราคารวม: ${carTotal.toLocaleString()} บาท`;
                                         } else {
                                             msgBody += `\n💺 จำนวนที่นั่ง: ${seatCount} ที่นั่ง`;
                                             msgBody += `\n💰 ราคารวม: ${totalPrice.toLocaleString()} บาท`;
@@ -1923,7 +1943,7 @@
                 `;
                 document.body.appendChild(popup);
                 popup.messageText = message;
-                popup.querySelector('h3').textContent = vehicleType === 'รถเก๋งเหมาคัน 4 ที่นั่ง'
+                popup.querySelector('h3').textContent = vehicleType === 'รถเก๋งเหมาคัน 3 ที่นั่ง'
                     ? `📋 คำขอจอง ${vehicleType}`
                     : `📋 คำขอจองเช็คที่นั่ง${vehicleType}`;
             }
