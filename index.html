@@ -1129,6 +1129,11 @@
                             document.getElementById('carCount').min = 2;
                             document.getElementById('returnFreeTimeSection').style.display = 'block';
                             document.getElementById('returnTimeSlotContainer').closest('.section').style.display = 'none';
+                            const isMobileRT = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                            if (!isMobileRT) {
+                                document.querySelectorAll('.desktop-time-select-free-return').forEach(el => el.style.display = 'block');
+                                document.getElementById('returnFreeTime').style.display = 'none';
+                            }
                         } else {
                             seatInput.value = 2;
                             seatInput.min = 2;
@@ -1402,22 +1407,26 @@
         }
                     
                         // ตรวจสอบว่าเป็น PC หรือมือถือ
-                function detectDevice() {
-                    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-                    
-                    if (isMobile) {
-                        // มือถือ - แสดง Time Picker
-                        document.querySelectorAll('.mobile-time-picker').forEach(el => el.style.display = 'block');
-                        document.querySelectorAll('.desktop-time-select').forEach(el => el.style.display = 'none');
-                    } else {
-                        // PC - แสดง Dropdown
-                        document.querySelectorAll('.mobile-time-picker').forEach(el => el.style.display = 'none');
-                        document.querySelectorAll('.desktop-time-select').forEach(el => el.style.display = 'block');
-                        
-                        // เพิ่ม Event Listeners สำหรับ Dropdown
-                        setupDropdownListeners();
-                    }
-                }
+                        function detectDevice() {
+                            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                            
+                            if (isMobile) {
+                                document.querySelectorAll('.mobile-time-picker').forEach(el => el.style.display = 'block');
+                                document.querySelectorAll('.desktop-time-select').forEach(el => el.style.display = 'none');
+                                document.querySelectorAll('.desktop-time-select-free').forEach(el => el.style.display = 'none');
+                                document.querySelectorAll('.desktop-time-select-free-return').forEach(el => el.style.display = 'none');
+                            } else {
+                                document.querySelectorAll('.mobile-time-picker').forEach(el => el.style.display = 'none');
+                                document.querySelectorAll('.desktop-time-select').forEach(el => el.style.display = 'block');
+                                // free-time และ free-time-return ยังซ่อนอยู่ก่อน รอให้เลือก vehicleType = รถเก๋ง
+                                document.querySelectorAll('.desktop-time-select-free').forEach(el => el.style.display = 'none');
+                                document.querySelectorAll('.desktop-time-select-free-return').forEach(el => el.style.display = 'none');
+                                
+                                setupDropdownListeners();
+                                setupFreeTimeListeners();
+                                setupReturnFreeTimeListeners();
+                            }
+                        }
                 
                 // ตั้งค่า Event Listeners สำหรับ Text Input (PC)
                 function setupDropdownListeners() {
@@ -1523,9 +1532,17 @@
                     
                     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
                     if (!isMobile) {
+                        // ขาไป: แสดง desktop input เมื่อเลือกรถเก๋ง, ซ่อน time picker
                         document.querySelectorAll('.desktop-time-select-free').forEach(el => el.style.display = isCar ? 'block' : 'none');
-                        document.querySelectorAll('.desktop-time-select-free-return').forEach(el => el.style.display = (isCar && tripType === 'ไป-กลับ') ? 'block' : 'none');
-                        document.getElementById('freeTime').style.display = isCar ? 'none' : 'block';
+                        document.getElementById('freeTime').style.display = 'none';
+                    
+                        // ขากลับ: แสดง desktop input เฉพาะเมื่อรถเก๋ง + ไป-กลับ
+                        const isRoundtrip = tripType === 'ไป-กลับ';
+                        document.querySelectorAll('.desktop-time-select-free-return').forEach(el => 
+                            el.style.display = (isCar && isRoundtrip) ? 'block' : 'none'
+                        );
+                        document.getElementById('returnFreeTime').style.display = 'none';
+                    
                         setupFreeTimeListeners();
                         setupReturnFreeTimeListeners();
                     }
@@ -1725,8 +1742,13 @@
                     airline: returnAirline,
                     flightTime: returnFlightTime,
                     location: returnLocation,  
-                    freeTime: document.getElementById('returnFreeTime').value  
-
+                    freeTime: isMobileCheck
+                        ? document.getElementById('returnFreeTime').value
+                        : (() => {
+                            const h = document.getElementById('returnFreeHour').value;
+                            const m = document.getElementById('returnFreeMinute').value;
+                            return (h && m) ? `${h}:${m}` : document.getElementById('returnFreeTime').value;
+                        })()
                 };
                 }
             }
