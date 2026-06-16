@@ -832,8 +832,8 @@
                     <div class="section-title">🚐 เลือกเส้นทาง (ขากลับ)</div>
                     <div class="route-selector">
                         <div class="route-option" onclick="selectReturnRoute('return-pattani-airport')">
-                            <input type="radio" id="return-pattani-airport" name="returnRoute" value="ปัตตานี → สนามบิน 🛫">
-                            <label for="return-pattani-airport">ปัตตานี → สนามบิน 🛫</label>
+                        <input type="radio" id="return-pattani-airport" name="returnRoute" value="ปัตตานี → สนามบิน">
+                        <label for="return-pattani-airport">ปัตตานี → สนามบิน</label>
                         </div>
                         <div class="route-option active" onclick="selectReturnRoute('return-airport-pattani')">
                             <input type="radio" id="return-airport-pattani" name="returnRoute" value="🛬 สนามบิน → ปัตตานี" checked>
@@ -1835,7 +1835,8 @@
                                             : `✅ รับคำขอเช็คที่นั่งรถตู้ลีมูซีนเรียบร้อยแล้วค่ะ`;
                     
                                         // === สร้าง body ข้อความ ===
-                                        let msgBody = `\n━━━━━━━━━━━━━━━━\n📋 หมายเลขคำขอ: ${reqNum}\n\n🎫 ประเภท: ${tripType}\n🚗 ประเภทรถ: ${vehicleType}`;
+                                        const vehicleEmoji = isCar ? '🚗' : '🚐';
+                                        let msgBody = `\n━━━━━━━━━━━━━━━━\n📋 หมายเลขคำขอ: ${reqNum}\n\n🎫 ประเภท: ${tripType}\n${vehicleEmoji} ประเภทรถ: ${vehicleType}`;                
                     
                                         if (tripType === 'ไป-กลับ') {
                                             msgBody += `\n\n🛫 ขาไป`;
