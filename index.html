@@ -686,6 +686,216 @@
 
             .section-wrap { padding: 48px 16px; }
         }
+
+        /* PACKAGE FULL BANNER */
+        .package-full-banner {
+            background: linear-gradient(135deg, var(--green-dark) 0%, var(--green) 100%);
+            border-radius: var(--radius);
+            padding: 20px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            margin-bottom: 24px;
+            border: none;
+            width: 100%;
+            text-align: left;
+            transition: opacity 0.2s, transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .package-full-banner::before {
+            content: '';
+            position: absolute;
+            top: -40px; right: -40px;
+            width: 120px; height: 120px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 50%;
+        }
+        
+        .package-full-banner:hover {
+            opacity: 0.93;
+            transform: translateY(-1px);
+        }
+        
+        .package-full-banner .banner-left { display: flex; align-items: center; gap: 16px; }
+        
+        .package-full-banner .banner-icon {
+            font-size: 32px;
+            line-height: 1;
+        }
+        
+        .package-full-banner .banner-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 4px;
+        }
+        
+        .package-full-banner .banner-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: #fff;
+            line-height: 1;
+        }
+        
+        .package-full-banner .banner-desc {
+            font-size: 12px;
+            color: rgba(255,255,255,0.65);
+            margin-top: 4px;
+        }
+        
+        .banner-arrow {
+            color: rgba(255,255,255,0.8);
+            font-size: 22px;
+            font-weight: 700;
+            transition: transform 0.2s;
+        }
+        
+        .package-full-banner:hover .banner-arrow { transform: translateX(4px); }
+        
+        /* PACKAGE MODAL */
+        .pkg-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.72);
+            z-index: 10002;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .pkg-modal.active { display: flex !important; }
+        
+        .pkg-modal-box {
+            background: #fff;
+            border-radius: var(--radius);
+            width: 100%;
+            max-width: 520px;
+            overflow: hidden;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+        }
+        
+        .pkg-modal-header {
+            background: linear-gradient(135deg, var(--green-dark) 0%, var(--green) 100%);
+            padding: 28px 28px 24px;
+            text-align: center;
+            color: #fff;
+        }
+        
+        .pkg-modal-header .modal-eyebrow {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.65);
+            margin-bottom: 8px;
+        }
+        
+        .pkg-modal-header h3 {
+            font-family: 'Oswald', sans-serif;
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        
+        .pkg-modal-header p {
+            font-size: 13px;
+            color: rgba(255,255,255,0.7);
+            margin-top: 6px;
+        }
+        
+        .pkg-modal-body { padding: 24px; }
+        
+        .pkg-service-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .pkg-service-item {
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            position: relative;
+            background: #fff;
+            user-select: none;
+        }
+        
+        .pkg-service-item:hover { border-color: var(--green); background: #f7fcf9; }
+        
+        .pkg-service-item.selected {
+            border-color: var(--green);
+            background: #f0f8f4;
+        }
+        
+        .pkg-service-item input[type="checkbox"] {
+            position: absolute;
+            top: 8px; right: 8px;
+            width: 16px; height: 16px;
+            accent-color: var(--green);
+            cursor: pointer;
+        }
+        
+        .pkg-service-item .si { font-size: 24px; margin-bottom: 6px; }
+        .pkg-service-item .sn { font-size: 12px; font-weight: 600; color: var(--ink); }
+        
+        .pkg-modal-footer {
+            display: flex;
+            gap: 10px;
+            padding: 0 24px 24px;
+        }
+        
+        .pkg-confirm-btn {
+            flex: 1;
+            padding: 14px;
+            background: var(--green);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius);
+            font-family: 'Oswald', sans-serif;
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .pkg-confirm-btn:hover { background: var(--green-dark); }
+        
+        .pkg-cancel-btn {
+            padding: 14px 20px;
+            background: var(--cream);
+            color: var(--mid);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .pkg-cancel-btn:hover { background: #ece9e4; }
+        
+        @media (max-width: 768px) {
+            .pkg-service-grid { grid-template-columns: repeat(2, 1fr); }
+            .package-full-banner { padding: 16px 20px; }
+            .package-full-banner .banner-title { font-size: 18px; }
+        }
+        
     </style>
 </head>
 <body>
@@ -747,6 +957,68 @@
             <span id="userName">กำลังโหลด...</span>
         </div>
 
+        <!-- FULL PACKAGE BANNER -->
+        <button class="package-full-banner" onclick="openPkgModal()">
+            <div class="banner-left">
+                <div class="banner-icon">🌟</div>
+                <div>
+                    <div class="banner-label">แนะนำ</div>
+                    <div class="banner-title">แพ็กเกจเต็มรูปแบบ</div>
+                    <div class="banner-desc">เลือกบริการที่ต้องการทั้งหมดในขั้นตอนเดียว</div>
+                </div>
+            </div>
+            <div class="banner-arrow">→</div>
+        </button>
+        
+        <!-- PACKAGE MODAL -->
+        <div class="pkg-modal" id="pkgModal">
+            <div class="pkg-modal-box">
+                <div class="pkg-modal-header">
+                    <div class="modal-eyebrow">เลือกบริการที่ต้องการ</div>
+                    <h3>แพ็กเกจเต็มรูปแบบ</h3>
+                    <p>ติ๊กบริการที่ต้องการ แล้วกดยืนยัน</p>
+                </div>
+                <div class="pkg-modal-body">
+                    <div class="pkg-service-grid">
+                        <label class="pkg-service-item" onclick="togglePkgService('pkg-accommodation')">
+                            <input type="checkbox" id="pkg-accommodation" checked>
+                            <div class="si">🏨</div>
+                            <div class="sn">ที่พัก</div>
+                        </label>
+                        <label class="pkg-service-item" onclick="togglePkgService('pkg-flight')">
+                            <input type="checkbox" id="pkg-flight" checked>
+                            <div class="si">✈️</div>
+                            <div class="sn">ตั๋วเครื่องบิน</div>
+                        </label>
+                        <label class="pkg-service-item" onclick="togglePkgService('pkg-transport')">
+                            <input type="checkbox" id="pkg-transport" checked>
+                            <div class="si">🚐</div>
+                            <div class="sn">รถรับส่ง</div>
+                        </label>
+                        <label class="pkg-service-item" onclick="togglePkgService('pkg-visa')">
+                            <input type="checkbox" id="pkg-visa" checked>
+                            <div class="si">📋</div>
+                            <div class="sn">วีซ่า</div>
+                        </label>
+                        <label class="pkg-service-item" onclick="togglePkgService('pkg-food')">
+                            <input type="checkbox" id="pkg-food" checked>
+                            <div class="si">🍽️</div>
+                            <div class="sn">อาหาร</div>
+                        </label>
+                        <label class="pkg-service-item" onclick="togglePkgService('pkg-sightseeing')">
+                            <input type="checkbox" id="pkg-sightseeing">
+                            <div class="si">🕌</div>
+                            <div class="sn">เยี่ยมชมสถานที่</div>
+                        </label>
+                    </div>
+                </div>
+                <div class="pkg-modal-footer">
+                    <button class="pkg-cancel-btn" onclick="closePkgModal()">ยกเลิก</button>
+                    <button class="pkg-confirm-btn" onclick="confirmPkgSelection()">✓ ยืนยันการเลือก</button>
+                </div>
+            </div>
+        </div>
+        
         <!-- SERVICES -->
         <div class="form-card">
             <div class="form-card-title">📦 บริการที่ต้องการ</div>
@@ -1112,6 +1384,67 @@
             const popup = document.querySelector('.message-popup');
             if (popup) popup.remove();
         }
+
+        function openPkgModal() {
+            // Sync modal checkboxes from main form
+            document.getElementById('pkg-accommodation').checked = document.getElementById('service-accommodation').checked;
+            document.getElementById('pkg-flight').checked = document.getElementById('service-flight').checked;
+            document.getElementById('pkg-transport').checked = document.getElementById('service-transport').checked;
+            document.getElementById('pkg-visa').checked = document.getElementById('service-visa').checked;
+            document.getElementById('pkg-food').checked = document.getElementById('service-food').checked;
+        
+            // Sync selected styles
+            document.querySelectorAll('.pkg-service-item').forEach(item => {
+                const cb = item.querySelector('input[type="checkbox"]');
+                item.classList.toggle('selected', cb.checked);
+            });
+        
+            document.getElementById('pkgModal').classList.add('active');
+        }
+        
+        function closePkgModal() {
+            document.getElementById('pkgModal').classList.remove('active');
+        }
+        
+        function togglePkgService(id) {
+            const cb = document.getElementById(id);
+            const item = cb.closest('.pkg-service-item');
+            setTimeout(() => item.classList.toggle('selected', cb.checked), 0);
+        }
+        
+        function confirmPkgSelection() {
+            // Map modal → main form checkboxes
+            const map = {
+                'pkg-accommodation': 'service-accommodation',
+                'pkg-flight': 'service-flight',
+                'pkg-transport': 'service-transport',
+                'pkg-visa': 'service-visa',
+                'pkg-food': 'service-food',
+            };
+        
+            Object.entries(map).forEach(([pkgId, serviceId]) => {
+                const checked = document.getElementById(pkgId).checked;
+                const cb = document.getElementById(serviceId);
+                cb.checked = checked;
+                cb.closest('.service-card').classList.toggle('selected', checked);
+            });
+        
+            const sightseeingChecked = document.getElementById('pkg-sightseeing').checked;
+            const otherCb = document.getElementById('service-other');
+            otherCb.checked = sightseeingChecked;
+            otherCb.closest('.service-card').classList.toggle('selected', sightseeingChecked);
+        
+            closePkgModal();
+        
+            // Scroll to services section
+            document.querySelector('.form-card').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        
+        // Close modal when clicking backdrop
+        document.getElementById('pkgModal').addEventListener('click', function(e) {
+            if (e.target === this) closePkgModal();
+        });
+        
     </script>
 </body>
 </html>
